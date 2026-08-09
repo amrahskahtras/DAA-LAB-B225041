@@ -1,20 +1,9 @@
-/*
- * mergesort_compare.c
- *
- * Q2: Merge sort (2-way, halves) vs Modified merge sort (3-way, thirds).
- *
- * Both are implemented to count the number of COMPARISONS made during
- * sorting, so we can empirically confirm both are Theta(n log n),
- * just with different constants (log base 2 vs log base 3).
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 long comparisons;
 
-/* ---------------- Standard 2-way merge sort ---------------- */
 void merge2(int *arr, int lo, int mid, int hi, int *tmp) {
     int i = lo, j = mid + 1, k = lo;
     while (i <= mid && j <= hi) {
@@ -34,16 +23,15 @@ void mergesort2(int *arr, int lo, int hi, int *tmp) {
     merge2(arr, lo, mid, hi, tmp);
 }
 
-/* ---------------- Modified 3-way merge sort ---------------- */
 void merge3(int *arr, int lo, int m1, int m2, int hi, int *tmp) {
     int i = lo, j = m1 + 1, k = m2 + 1, t = lo;
     while (i <= m1 && j <= m2 && k <= hi) {
-        comparisons += 2; /* compare 3 candidates -> 2 comparisons to find min */
+        comparisons += 2; 
         if (arr[i] <= arr[j] && arr[i] <= arr[k])      tmp[t++] = arr[i++];
         else if (arr[j] <= arr[i] && arr[j] <= arr[k]) tmp[t++] = arr[j++];
         else                                            tmp[t++] = arr[k++];
     }
-    /* one sub-array exhausted: fall back to standard 2-way merges */
+
     while (i <= m1 && j <= m2) {
         comparisons++;
         if (arr[i] <= arr[j]) tmp[t++] = arr[i++]; else tmp[t++] = arr[j++];
@@ -64,7 +52,7 @@ void merge3(int *arr, int lo, int m1, int m2, int hi, int *tmp) {
 void mergesort3(int *arr, int lo, int hi, int *tmp) {
     if (lo >= hi) return;
     int len = hi - lo + 1;
-    if (len < 3) { /* base case: fall back to a trivial 2-way split */
+    if (len < 3) { 
         int mid = lo + (hi - lo) / 2;
         mergesort3(arr, lo, mid, tmp);
         mergesort3(arr, mid + 1, hi, tmp);

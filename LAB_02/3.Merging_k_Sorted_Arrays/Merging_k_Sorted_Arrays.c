@@ -1,21 +1,3 @@
-/*
- * kmerge.c
- *
- * Q3: Merging k sorted arrays, each of size n.
- *
- *  Method 1 (sequential): repeatedly merge the running result with the
- *      next array: merge(A1,A2), then merge(result,A3), ..., merge(result,Ak).
- *      Worst-case running time: Theta(k^2 * n)
- *
- *  Method 2 (pairwise / tournament): merge arrays in pairs, then merge
- *      those results in pairs, and so on (like the merge phase of merge
- *      sort applied across k arrays).
- *      Worst-case running time: Theta(k * n * log2(k))
- *
- * We count comparisons made by each method for various (k, n) and dump
- * to CSV.
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -34,7 +16,6 @@ void merge_two(int *a, int na, int *b, int nb, int *out) {
     while (j < nb) out[k++] = b[j++];
 }
 
-/* ---------------- Method 1: sequential merging ---------------- */
 int *merge_k_sequential(int **arrays, int k, int n) {
     int *result = malloc(n * sizeof(int));
     for (int i = 0; i < n; i++) result[i] = arrays[0][i];
@@ -50,9 +31,7 @@ int *merge_k_sequential(int **arrays, int k, int n) {
     return result;
 }
 
-/* ---------------- Method 2: pairwise (tournament) merging ---------------- */
 int *merge_k_pairwise(int **arrays, int k, int n) {
-    /* copy pointers/sizes into working lists we can shrink round by round */
     int **cur = malloc(k * sizeof(int *));
     int *sizes = malloc(k * sizeof(int));
     for (int i = 0; i < k; i++) {
@@ -77,7 +56,7 @@ int *merge_k_pairwise(int **arrays, int k, int n) {
             idx++;
             free(cur[i]); free(cur[i + 1]);
         }
-        if (count % 2 == 1) { /* odd one out, carries over unmerged */
+        if (count % 2 == 1) { 
             next[idx] = cur[count - 1];
             next_sizes[idx] = sizes[count - 1];
             idx++;
