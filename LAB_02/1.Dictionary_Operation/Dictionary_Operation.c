@@ -1,47 +1,6 @@
-/*
- * dict_ops.c
- *
- * Q1: All SEVEN dictionary operations, on 6 different underlying
- * data structures:
- *   1. Unsorted array
- *   2. Sorted array
- *   3. Singly linked unsorted list
- *   4. Singly linked sorted list
- *   5. Doubly linked unsorted list
- *   6. Doubly linked sorted list
- *
- * Operations (worst-case step count measured empirically):
- *   Search(D, k)            - find item with key k (k chosen so it is
- *                              missing and cannot cause early exit)
- *   Insert(D, x)             - add a new item (worst-case position per
- *                              structure)
- *   Delete(D, x)              - remove item given a DIRECT POINTER/INDEX
- *                              to it (no searching needed)
- *   Max(D)                    - item with the largest key
- *   Min(D)                    - item with the smallest key
- *   Predecessor(D, x)         - item whose key is immediately before x
- *   Successor(D, x)           - item whose key is immediately after x
- *
- * Theoretical worst-case table (n = number of items):
- *
- *                    Search   Insert  Delete  Max   Min   Pred   Succ
- *  Unsorted array     O(n)     O(1)   O(1)*   O(n)  O(n)  O(n)   O(n)
- *  Sorted array      O(logn)   O(n)   O(n)    O(1)  O(1)  O(1)   O(1)
- *  SLL unsorted       O(n)     O(1)   O(n)**  O(n)  O(n)  O(n)   O(n)
- *  SLL sorted         O(n)     O(n)   O(n)**  O(n)  O(1)  O(n)   O(1)
- *  DLL unsorted       O(n)     O(1)   O(1)    O(n)  O(n)  O(n)   O(n)
- *  DLL sorted         O(n)     O(n)   O(1)    O(1)  O(1)  O(1)   O(1)
- *
- *  *  swap-with-last trick (order doesn't matter, unsorted).
- *  ** even given a pointer to the node, a singly linked list needs its
- *     PREDECESSOR to unlink it, which requires an O(n) scan from head.
- *  DLL sorted assumes head AND tail pointers are maintained.
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 
-/* ================= Unsorted array ================= */
 long ua_search(int *arr, int n, int key) {
     long steps = 0;
     for (int i = 0; i < n; i++) { steps++; if (arr[i] == key) return steps; }
@@ -49,9 +8,9 @@ long ua_search(int *arr, int n, int key) {
 }
 long ua_insert(void) { return 1; }
 long ua_delete(void) { return 1; }
-long ua_max(int n) { return n; }   /* scan all */
-long ua_min(int n) { return n; }   /* scan all */
-long ua_pred_succ(int n) { return n; } /* scan all to find closest key */
+long ua_max(int n) { return n; }
+long ua_min(int n) { return n; }
+long ua_pred_succ(int n) { return n; } 
 
 /* ================= Sorted array ================= */
 long sa_search(int *arr, int n, int key) {
@@ -70,9 +29,8 @@ long sa_insert(int n) { return n + 1; }
 long sa_delete(int n) { return n; }
 long sa_max(void) { return 1; }
 long sa_min(void) { return 1; }
-long sa_pred_succ(void) { return 1; } /* adjacent index */
+long sa_pred_succ(void) { return 1; } 
 
-/* ================= Singly linked list (unsorted) ================= */
 typedef struct SNode { int key; struct SNode *next; } SNode;
 
 long sl_search(SNode *head, int key) {
@@ -94,7 +52,6 @@ long sl_max(SNode *head) { long s=0; for (SNode *c=head;c;c=c->next) s++; return
 long sl_min(SNode *head) { long s=0; for (SNode *c=head;c;c=c->next) s++; return s; }
 long sl_pred_succ_unsorted(SNode *head) { long s=0; for (SNode *c=head;c;c=c->next) s++; return s; }
 
-/* ================= Singly linked list (sorted, ascending) ================= */
 long ss_search(SNode *head, int key) {
     long steps = 0;
     for (SNode *cur = head; cur; cur = cur->next) {
@@ -114,12 +71,10 @@ long ss_delete_via_pred_scan(SNode *head, SNode *target) {
     }
     return steps;
 }
-long ss_max(int n) { return n; }      /* no tail pointer: walk to the end */
-long ss_min(void) { return 1; }        /* head */
-long ss_successor(void) { return 1; }  /* just follow next pointer */
-long ss_predecessor_worst(SNode *head, SNode *target) {
-    /* must scan from head to find target's predecessor -- worst case
-       when target is the tail */
+long ss_max(int n) { return n; }
+long ss_min(void) { return 1; }        
+long ss_successor(void) { return 1; }  
+long ss_predecessor_worst(SNode *head, SNode *target) {/
     long steps = 0;
     for (SNode *cur = head; cur; cur = cur->next) {
         steps++;
@@ -128,7 +83,6 @@ long ss_predecessor_worst(SNode *head, SNode *target) {
     return steps;
 }
 
-/* ================= Doubly linked list (unsorted) ================= */
 typedef struct DNode { int key; struct DNode *prev, *next; } DNode;
 
 long dl_search(DNode *head, int key) {
@@ -142,7 +96,6 @@ long dl_max(int n) { return n; }
 long dl_min(int n) { return n; }
 long dl_pred_succ_unsorted(int n) { return n; }
 
-/* ================= Doubly linked list (sorted, ascending) ================= */
 long ds_search(DNode *head, int key) {
     long steps = 0;
     for (DNode *cur = head; cur; cur = cur->next) {
@@ -154,11 +107,10 @@ long ds_search(DNode *head, int key) {
 }
 long ds_insert(int n) { return n + 1; }
 long ds_delete(void) { return 1; }
-long ds_max(void) { return 1; }        /* tail pointer maintained */
-long ds_min(void) { return 1; }        /* head pointer maintained */
-long ds_pred_succ(void) { return 1; }  /* prev / next pointer directly */
+long ds_max(void) { return 1; }        
+long ds_min(void) { return 1; }        
+long ds_pred_succ(void) { return 1; }  
 
-/* ---- helpers to build fresh structures of size n with keys 0..n-1 ---- */
 int *build_array(int n) {
     int *a = malloc(n * sizeof(int));
     for (int i = 0; i < n; i++) a[i] = i;
@@ -214,7 +166,6 @@ int main(void) {
         int missing_key = n;
         SNode *s_tail = slist_tail(slist);
 
-        /* ---- Search ---- */
         long ua_s = ua_search(arr, n, missing_key);
         long sa_s = sa_search(arr, n, missing_key);
         long sl_s = sl_search(slist, missing_key);
@@ -222,7 +173,6 @@ int main(void) {
         long dl_s = dl_search(dlist, missing_key);
         long ds_s = ds_search(dlist, missing_key);
 
-        /* ---- Insert ---- */
         long ua_i = ua_insert();
         long sa_i = sa_insert(n);
         long sl_i = sl_insert();
@@ -230,7 +180,6 @@ int main(void) {
         long dl_i = dl_insert();
         long ds_i = ds_insert(n);
 
-        /* ---- Delete (given pointer to tail: worst case for SLL) ---- */
         long ua_d = ua_delete();
         long sa_d = sa_delete(n);
         long sl_d = sl_delete_via_pred_scan(slist, s_tail);
@@ -238,7 +187,6 @@ int main(void) {
         long dl_d = dl_delete();
         long ds_d = ds_delete();
 
-        /* ---- Max ---- */
         long ua_mx = ua_max(n);
         long sa_mx = sa_max();
         long sl_mx = sl_max(slist);
@@ -246,7 +194,6 @@ int main(void) {
         long dl_mx = dl_max(n);
         long ds_mx = ds_max();
 
-        /* ---- Min ---- */
         long ua_mn = ua_min(n);
         long sa_mn = sa_min();
         long sl_mn = sl_min(slist);
@@ -254,7 +201,6 @@ int main(void) {
         long dl_mn = dl_min(n);
         long ds_mn = ds_min();
 
-        /* ---- Predecessor (worst case: query the tail element) ---- */
         long ua_p = ua_pred_succ(n);
         long sa_p = sa_pred_succ();
         long sl_p = sl_pred_succ_unsorted(slist);
@@ -262,7 +208,6 @@ int main(void) {
         long dl_p = dl_pred_succ_unsorted(n);
         long ds_p = ds_pred_succ();
 
-        /* ---- Successor ---- */
         long ua_su = ua_pred_succ(n);
         long sa_su = sa_pred_succ();
         long sl_su = sl_pred_succ_unsorted(slist);

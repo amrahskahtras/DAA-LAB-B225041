@@ -4,7 +4,6 @@
 
 long comparisons;
 
-/* merge two sorted int arrays a[0..na-1], b[0..nb-1] into out (size na+nb) */
 void merge_two(int *a, int na, int *b, int nb, int *out) {
     int i = 0, j = 0, k = 0;
     while (i < na && j < nb) {
