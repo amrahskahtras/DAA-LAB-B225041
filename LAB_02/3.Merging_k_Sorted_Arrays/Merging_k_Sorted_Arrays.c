@@ -112,6 +112,36 @@ int main(void) {
         free(arrays);
     }
 
+    int k_fixed = 16;
+    int ns[] = {100, 200, 400, 800, 1600, 3200, 6400};
+    int num_ns = sizeof(ns) / sizeof(ns[0]);
+
+    printf("\n=== Fixed k = %d, varying n ===\n", k_fixed);
+    printf("%6s | %-18s | %-18s\n", "n", "sequential", "pairwise");
+    for (int t = 0; t < num_ns; t++) {
+        int n = ns[t];
+        int **arrays = malloc(k_fixed * sizeof(int *));
+        for (int i = 0; i < k_fixed; i++) {
+            arrays[i] = malloc(n * sizeof(int));
+            fill_sorted_random(arrays[i], n, 0);
+        }
+
+        comparisons = 0;
+        int *r1 = merge_k_sequential(arrays, k_fixed, n);
+        long c_seq = comparisons;
+
+        comparisons = 0;
+        int *r2 = merge_k_pairwise(arrays, k_fixed, n);
+        long c_pair = comparisons;
+
+        printf("%6d | %-18ld | %-18ld\n", n, c_seq, c_pair);
+        fprintf(csv, "%d,%d,%ld,%ld\n", k_fixed, n, c_seq, c_pair);
+
+        free(r1); free(r2);
+        for (int i = 0; i < k_fixed; i++) free(arrays[i]);
+        free(arrays);
+    }
+
     fclose(csv);
     printf("\nData written to kmerge_data.csv\n");
     return 0;
